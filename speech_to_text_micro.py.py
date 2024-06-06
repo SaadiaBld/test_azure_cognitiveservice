@@ -48,3 +48,5 @@ if recognized_text:
     document = {"text": recognized_text}    
     result = collection.insert_one(document)
     print("Document inséré avec l'ID {}".format(result.inserted_id))
+
+
