@@ -86,3 +86,6 @@ else:
 cursor = collection.find().sort([('_id', pymongo.DESCENDING)]).limit(1)
 last_document = cursor[0]
 print(f"Last document in the collection: {last_document}")
+
+####integration de langchain pour creer la chaine de traitement de la transcription de l'audio en texte et analyse des sentiments
+

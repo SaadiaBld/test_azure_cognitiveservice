@@ -1,5 +1,4 @@
 #transcription de l'audio en texte, analyse des sentiments orchestré par langchain 
-#créer une chaine qui génére la transcription de l'audio en texte et analyse des sentiments 
 ### version avec huggingface qui prend input en anglais
 
 from azure.core.credentials import AzureKeyCredential
@@ -7,7 +6,6 @@ from azure.ai.textanalytics import TextAnalyticsClient
 from transformers import pipeline
 import pymongo
 import os
-#from langchain import LangChain 
 from dotenv import load_dotenv 
 
 load_dotenv() #charger les variables d'environnement à partir du fichier .env 
