@@ -1,12 +1,12 @@
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
-from langchain.llms import OpenAI
+from langchain.llms import AzureOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, SequentialChain
 import pymongo
 import os
 
-llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
+llm = AzureOpenAI()
 
 def transcription_audio_texte():
     speech_key, service_region = os.getenv('SPEECH_KEY'), os.getenv('SERVICE_REGION')
