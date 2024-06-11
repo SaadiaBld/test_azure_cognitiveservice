@@ -15,7 +15,7 @@ import asyncio
 
 
 load_dotenv()
-llm = AzureOpenAI()
+#llm = AzureOpenAI()
 
 def transcription_audio_texte(_):
     speech_key, service_region = os.getenv('SPEECH_KEY'), os.getenv('SERVICE_REGION')
@@ -86,13 +86,6 @@ def analyse_sentiment_enregistrement(doc):
 
 
 
-# définition des variables d'environnement pour l'API OpenAI ici pour éviter les redondances dans le code 
-openai.api_key = os.getenv("AZURE_OPENAI_API_KEY")
-openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT") # your endpoint should look like the following
-openai.api_type = 'azure'
-openai.api_version = '2023-05-15'
-deployment_name="QSGC-gpt35"
-
 def if_negative_sentiment(transcription):
     #connexion à la base de données
     mongo_uri = os.getenv('MONGO_URI')
@@ -107,18 +100,21 @@ def if_negative_sentiment(transcription):
     doc = cursor[0]
 
     if doc and doc['sentiment'] == 'negative':
+        openai.api_key = os.getenv("AZURE_OPENAI_API_KEY")
+        openai.api_base = os.getenv("AZURE_OPENAI_ENDPOINT") # your endpoint should look like the following
+        openai.api_type = 'azure'
+        openai.api_version = '2023-05-15'
+        deployment_name="QSGC-gpt35"
+
         prompt=f"Le client a exprimé son insatisfaction dans le texte suivant: '{doc['text']}'. En utilisant le texte, explique en une phrase pourquoi le client est mécontent."
-        response = openai.Completion.create(
-            engine=deployment_name,
-            prompt=prompt,
-            max_tokens=100)
-        reason_text=response['choices'][0]['text'].strip()
-        print("VOICI LE/LES RAISON(S) DE L'INSATISFACTION DU CLIENT", reason_text)
-        collection.update_one(
-            {'_id': doc['_id']}, 
-            {'$set':{'reasons': reason_text}})
-        print("Raisons de l'insatisfaction enregistrées dans la base de données")
     
+        response = openai.ChatCompletion.create(engine=deployment_name, messages=[
+                    {"role": "system", "content": "Tu es un assistant utile."},
+                    {"role": "user", "content": prompt}], max_tokens=12)
+        reason = response['choices'][0]['message']['content'].replace('\n', '').replace(' .', '.').strip()
+        print(f"Voici la/les raisons qui expliquent l'insatisfaction du client:", reason)
+
+
 # Crée une fonction asynchrone
 async def main():
     runnable1=RunnableLambda(transcription_audio_texte)
