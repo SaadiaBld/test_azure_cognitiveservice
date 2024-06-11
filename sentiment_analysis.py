@@ -31,7 +31,7 @@ collection = db[collection_name]
 cursor = collection.find().sort([('_id', pymongo.DESCENDING)]).limit(1)
 document = cursor[0]
 
-# Analise sentiment, par défaut c'est le nouveau modele qui est utilisé
+# Analyse sentiment, par défaut c'est le nouveau modele qui est utilisé
 result = text_analytics_client.analyze_sentiment([document['text']], show_opinion_mining=True, show_stats=True, language='fr')
 doc = result[0]
 
