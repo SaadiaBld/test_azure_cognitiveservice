@@ -1,11 +1,10 @@
-azure-cognitiveservices-speech
-azure-ai-textanalytics
+azure-cognitiveservices-speech==1.37.0
+azure-ai-textanalytics==5.3.0
 python-dotenv==1.0.1
 pymongo==4.7.2
-langchain #==0.2.2
-langchain-community #==0.2.4
+langchain==0.2.2
+langchain-community 
 transformers==4.41.2
 tensorflow==2.16.1
-#openai #==0.28.0  #version qui fonctionne avec chaine langchain
-#openai>=1.26.0,<2.0.0
 openai==0.28.0
+gradio==4.36.1

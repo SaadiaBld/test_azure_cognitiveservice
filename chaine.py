@@ -4,10 +4,11 @@ from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import TextAnalyticsClient
 from dotenv import load_dotenv
 #from langchain.llms import AzureOpenAI
-from langchain_openai import AzureOpenAI
+#from langchain_openai import AzureOpenAI
 from langchain.prompts import PromptTemplate
 #from langchain.chains import LLMChain, SequentialChain, RunnableSequence
 from langchain_core.runnables import RunnableLambda
+from concurrent.futures import ThreadPoolExecutor
 import pymongo
 import openai
 import os
@@ -15,9 +16,20 @@ import asyncio
 
 
 load_dotenv()
-#llm = AzureOpenAI()
 
-def transcription_audio_texte(_):
+executor = ThreadPoolExecutor(max_workers=1)
+
+#fonction qui permet de 
+async def transcription_audio_texte(audio): 
+    if audio is None:
+        print("Audio file not yet created")
+        return None
+    else:
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(executor, synchronous_transcription, audio)
+        return result
+    
+def transcription_audio_texte_terminal(_): #fonction qui permet d'engregistrer un vocal en ligne de commandes mais gradio ne peut accéder directement au micro
     speech_key, service_region = os.getenv('SPEECH_KEY'), os.getenv('SERVICE_REGION')
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
     speech_config.speech_recognition_language="fr-FR"
@@ -37,6 +49,26 @@ def transcription_audio_texte(_):
             print("Error details: {}".format(cancellation_details.error_details))
         recognized_text = None
     return recognized_text 
+
+def synchronous_transcription(audio): #fonction pour enregistrer audio avec gradio 
+    speech_key, service_region = os.getenv('SPEECH_KEY'), os.getenv('SERVICE_REGION')
+    speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+    speech_config.speech_recognition_language="fr-FR"
+    audio_config = speechsdk.audio.AudioConfig(filename=audio)
+    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+    result = speech_recognizer.recognize_once()
+    if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+        recognized_text = result.text
+    elif result.reason == speechsdk.ResultReason.NoMatch:
+        recognized_text = "Echec de la reconnaissance vocale: {}".format(result.no_match_details)
+    elif result.reason == speechsdk.ResultReason.Canceled:
+        cancellation_details = result.cancellation_details
+        recognized_text = "Reconnaissance vocale annulée: {}".format(cancellation_details.reason)
+        if cancellation_details.reason == speechsdk.CancellationReason.Error:
+            recognized_text += "\nError details: {}".format(cancellation_details.error_details)
+    return recognized_text
+
 
 def enregistrer_texte_mongodb(text_transcrit):
     if text_transcrit:
