@@ -1,30 +1,41 @@
-import azure.cognitiveservices.speech as speechsdk
-from dotenv import load_dotenv
-from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain, SequentialChain
-import pymongo
+import gradio as gr
+import soundfile as sf
 import os
+from datetime import datetime
+from chaine import synchronous_transcription, analyse_sentiment_enregistrement, if_negative_sentiment
 
-llm = OpenAI(model="gpt-3.5-turbo", temperature=0.1)
+# Fonction pour enregistrer l'audio
+def enregistrer_audio(audio):
+    audio = gr.Interface.load()
 
-def transcription_audio_texte():
-    # ... (same as before)
+    if audio is None:
+        return "Aucun fichier audio enregistré."
 
-def enregistrer_texte_mongodb(transcribed_text):
-    if transcribed_text:
-        mongo_uri = os.getenv('MONGO_URI')
-        db_name = os.getenv('DB_NAME')
-        collection_name = os.getenv('COLLECTION_NAME')
-        client = pymongo.MongoClient(mongo_uri)
-        db = client[db_name]
-        collection = db[collection_name]
-        document = {"text": transcribed_text}    
-        result = collection.insert_one(document)
-        print("Document inséré avec l'ID {}".format(result.inserted_id))
+    # le chemin pour enregistrer l'audio
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    audio_path = f"audio_{timestamp}.wav"
+    
+    # Sauvegarder l'audio
+    sf.write(audio_path, audio, 44100)
 
-chain = SequentialChain([
-    LLMChain(llm, transcription_audio_texte),
-    LLMChain(llm, enregistrer_texte_mongodb)
-])
-chain("")
+def process_audio(audio): 
+    # Analyser l'audio avec une fonction NLP
+    if audio is not None:
+        transcription = synchronous_transcription(audio)
+        sentiment = analyse_sentiment_enregistrement(transcription)
+        negative_sentiment = if_negative_sentiment(transcription)
+
+    return transcription, sentiment, negative_sentiment
+
+
+# Définition de l'interface Gradio
+with gr.Blocks() as interface:
+    with gr.Row():
+        audio_input = gr.Microphone(label="Enregistrer votre audio") as audio
+        save_button = gr.Button("Enregistrer et Analyser")
+    output = gr.Textbox(label="Résultat de la transcription") as process_audio()
+
+    save_button.click(enregistrer_audio, inputs=audio_input, outputs=output)
+
+# Lancement de l'interface
+interface.launch()

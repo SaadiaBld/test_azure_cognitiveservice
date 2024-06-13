@@ -8,3 +8,4 @@ transformers==4.41.2
 tensorflow==2.16.1
 openai==0.28.0
 gradio==4.36.1
+soundfile==0.12.1

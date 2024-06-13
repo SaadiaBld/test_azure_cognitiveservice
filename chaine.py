@@ -20,14 +20,14 @@ load_dotenv()
 executor = ThreadPoolExecutor(max_workers=1)
 
 #fonction qui permet de 
-async def transcription_audio_texte(audio): 
-    if audio is None:
-        print("Audio file not yet created")
-        return None
-    else:
-        loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(executor, synchronous_transcription, audio)
-        return result
+# async def transcription_audio_texte(audio): 
+#     if audio is None:
+#         print("Audio file not yet created")
+#         return None
+#     else:
+#         loop = asyncio.get_event_loop()
+#         result = await loop.run_in_executor(executor, synchronous_transcription, audio)
+#         return result
     
 def transcription_audio_texte_terminal(_): #fonction qui permet d'engregistrer un vocal en ligne de commandes mais gradio ne peut accéder directement au micro
     speech_key, service_region = os.getenv('SPEECH_KEY'), os.getenv('SERVICE_REGION')
@@ -54,6 +54,9 @@ def synchronous_transcription(audio): #fonction pour enregistrer audio avec grad
     speech_key, service_region = os.getenv('SPEECH_KEY'), os.getenv('SERVICE_REGION')
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
     speech_config.speech_recognition_language="fr-FR"
+
+    if audio is None or not os.path.isfile(audio):
+        raise ValueError("Invalid audio file path: {}".format(audio))
     audio_config = speechsdk.audio.AudioConfig(filename=audio)
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
@@ -149,7 +152,7 @@ def if_negative_sentiment(transcription):
 
 # Crée une fonction asynchrone
 async def main():
-    runnable1=RunnableLambda(transcription_audio_texte)
+    runnable1=RunnableLambda(synchronous_transcription)
     runnable2=RunnableLambda(enregistrer_texte_mongodb)
     runnable3=RunnableLambda(analyse_sentiment_enregistrement)
     runnable4=RunnableLambda(if_negative_sentiment)
