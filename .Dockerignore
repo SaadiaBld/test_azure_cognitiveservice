@@ -1,0 +1,29 @@
+# Ignorer les fichiers et dossiers relatifs à Git
+.git
+.gitignore
+
+# Ignorer les fichiers de configuration spécifiques à l'IDE
+.vscode
+.idea
+.pytest_cache/
+
+# Ignorer les fichiers de cache Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorer les dossiers d'environnement virtuel Python
+venv
+*.venv
+.env
+
+# Ignorer les fichiers de log
+*.log
+
+# Ignorer les fichiers temporaires
+*.tmp
+
+# Ignore les fichiers spécifiques aux systèmes d'exploitation
+.DS_Store
+Thumbs.db

@@ -1,12 +1,8 @@
-#from msilib import sequence
 import azure.cognitiveservices.speech as speechsdk
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.textanalytics import TextAnalyticsClient
 from dotenv import load_dotenv
-#from langchain.llms import AzureOpenAI
-#from langchain_openai import AzureOpenAI
 from langchain.prompts import PromptTemplate
-#from langchain.chains import LLMChain, SequentialChain, RunnableSequence
 from langchain_core.runnables import RunnableLambda
 from concurrent.futures import ThreadPoolExecutor
 import pymongo
@@ -16,18 +12,10 @@ import asyncio
 
 
 load_dotenv()
-
+#executor sert à exécuter des fonctions de manière asynchrone en parallèle: ici, on a besoin d'éxécuter plusieurs fonctions en parallèle: transcription_audio_texte, enregistrer_texte_mongodb, analyse_sentiment_enregistrement, if_negative_sentiment 
+#on crée une instance de ThreadPoolExecutor avec un seul worker pour exécuter les fonctions de manière asynchrone, 1 worker est suffisant car 1 seul enregistrement est effectué à la fois
 executor = ThreadPoolExecutor(max_workers=1)
 
-#fonction qui permet de 
-# async def transcription_audio_texte(audio): 
-#     if audio is None:
-#         print("Audio file not yet created")
-#         return None
-#     else:
-#         loop = asyncio.get_event_loop()
-#         result = await loop.run_in_executor(executor, synchronous_transcription, audio)
-#         return result
     
 def transcription_audio_texte_terminal(_): #fonction qui permet d'engregistrer un vocal en ligne de commandes mais gradio ne peut accéder directement au micro
     speech_key, service_region = os.getenv('SPEECH_KEY'), os.getenv('SERVICE_REGION')

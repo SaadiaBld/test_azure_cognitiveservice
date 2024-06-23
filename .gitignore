@@ -214,5 +214,30 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+# Ignorer les fichiers et dossiers spécifiques à l'éditeur
+.vscode/
 
+# Ignorer les fichiers compilés Python
+__pycache__/
+*.pyc
+
+# Ignorer les environnements virtuels
+venv/
+env/
+
+# Ignorer les fichiers de configuration de l'IDE
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignorer les fichiers spécifiques aux systèmes d'exploitation
+.DS_Store
+Thumbs.db
+
+# Ignorer le cache de pytest
+.pytest_cache/
+
+# Ignorer les fichiers compilés Python
+__pycache__/
+*.pyc
 # End of https://www.toptal.com/developers/gitignore/api/node,windows,linux,macos

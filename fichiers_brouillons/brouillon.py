@@ -2,7 +2,7 @@ import gradio as gr
 import soundfile as sf
 import os
 from datetime import datetime
-from chaine import synchronous_transcription, analyse_sentiment_enregistrement, if_negative_sentiment
+from fichiers_brouillons.chaine import synchronous_transcription, analyse_sentiment_enregistrement, if_negative_sentiment
 
 # Fonction pour enregistrer l'audio
 def enregistrer_audio(audio):
